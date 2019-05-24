@@ -43,7 +43,9 @@
       "id": "2",
       "lesson": "1",
       "title": "Test Section",
-      "exercises": []
+      "exercises": [
+        "2a"
+      ]
     },
     {
       "id": "3",
@@ -65,6 +67,17 @@
         "Adipisicing est",
         "Officia sunt"
       ]
+    },
+    {
+      "id": "2a",
+      "section": "2",
+      "type": "true-or-false",
+      "answer": "0",
+      "inputs": [
+        "true",
+        "false"
+      ],
+      "instructions": "True or false."
     }
   ]
 }
