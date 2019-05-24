@@ -1,0 +1,14 @@
+{
+  "name": "graph-pub",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "graphql-yoga": "^1.17.4",
+    "json-server": "^0.15.0",
+    "node-fetch": "^2.6.0"
+  }
+}

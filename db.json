@@ -1,0 +1,70 @@
+{
+  "lessons": [
+    {
+      "id": "1",
+      "title": "Amet reprehenderit ad amet nulla nulla eiusmod sit ut irure laboris aute.",
+      "img": {
+        "src": "../images/elit-quis-incididunt-reprehenderit-non-minim-reprehenderit-et-culpa.jpg",
+        "alt": "chapter image"
+      },
+      "objectives": [
+        "Laboris eiusmod ea irure consectetur officia nulla pariatur ullamco cupidatat non.",
+        "Ea excepteur dolore nostrud nisi magna incididunt duis duis incididunt fugiat tempor incididunt esse eiusmod.",
+        "Consectetur pariatur anim minim aute amet ipsum qui minim id."
+      ],
+      "sections": [
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    {
+      "id": "2",
+      "title": "Test 2",
+      "objectives": [
+        "do something",
+        "do something else"
+      ],
+      "sections": []
+    }
+  ],
+  "sections": [
+    {
+      "id": "1",
+      "lesson": "1",
+      "type": "listening",
+      "title": "Dolore veniam veniam culpa consectetur labore tempor sint excepteur ut.",
+      "audio": "../audio/dolor-ipsum-sint-et-et-incididunt-ea-ipsum-ullamco-magna-ea-reprehenderit.mp3",
+      "exercises": [
+        "1a"
+      ]
+    },
+    {
+      "id": "2",
+      "lesson": "1",
+      "title": "Test Section",
+      "exercises": []
+    },
+    {
+      "id": "3",
+      "lesson": "1",
+      "title": "Test Section",
+      "exercises": []
+    }
+  ],
+  "exercises": [
+    {
+      "id": "1a",
+      "section": "1",
+      "lesson": "1",
+      "type": "multiple-choice-problem",
+      "answer": "0,2,3,4,5,6,7,9,11",
+      "instructions": "Veniam do anim nulla sunt qui qui.",
+      "inputs": [
+        "Ex exercitation",
+        "Adipisicing est",
+        "Officia sunt"
+      ]
+    }
+  ]
+}
