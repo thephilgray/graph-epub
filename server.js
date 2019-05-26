@@ -1,6 +1,7 @@
 const { GraphQLServer } = require('graphql-yoga');
 const fetch = require('node-fetch');
 const jsonServer = require('json-server');
+const uniqid = require('uniqid');
 
 const dbServer = jsonServer.create();
 const router = jsonServer.router('db.json');
@@ -18,9 +19,18 @@ const getQuizType = multipleAnswers =>
   multipleAnswers ? 'select-many' : 'select-one'; // may need to handle additional logic later
 
 class Exercise {
-  constructor({ id, section, type, answer, instructions, prompt, inputs }) {
+  constructor({
+    identifier,
+    section,
+    type,
+    answer,
+    instructions,
+    prompt,
+    inputs
+  }) {
     this.sectionId = section;
-    this.id = id;
+    this.id = uniqid();
+    this.identifier = identifier;
     this.type = type;
     this.answer = answer;
     this.instructions = instructions;
@@ -38,10 +48,11 @@ class Exercise {
 }
 
 class Section {
-  constructor({ id, lesson, title, type, audio, exercises }) {
+  constructor({ identifier, lesson, title, type, audio, exercises }) {
     this.lessonId = lesson;
     this.exerciseIds = exercises;
-    this.id = id;
+    this.id = uniqid();
+    this.identifier = identifier;
     this.title = title;
     this.type = type;
     this.audio = audio;
@@ -65,8 +76,9 @@ class Section {
 }
 
 class Lesson {
-  constructor({ sections, objectives, id, title, img }) {
-    this.id = id;
+  constructor({ identifier, sections, objectives, title, img }) {
+    this.id = uniqid();
+    this.identifier = identifier;
     this.title = title;
     this.sectionIds = sections;
     this.objectives = objectives;
@@ -104,7 +116,7 @@ input ExerciseInput{
     quizType: String
 }
 type Lesson {
-    id: String!
+    id: Int!
     title: String
     img: String
     objectives: [String]
@@ -112,16 +124,16 @@ type Lesson {
 }
 
 type Section {
-    id: String!
+    id: Int!
     type: String
-    lesson: String!
+    lesson: Int!
     title: String!
     audio: String
     exercises: [Exercise]
 }
 type Exercise {
-    id: String!
-    section: String!
+    id: Int!
+    section: Int!
     type: String!
     answer: String!
     instructions: String
@@ -134,28 +146,28 @@ type Query{
     lessons: [Lesson]!
     sections: [Section]!
     exercises: [Exercise]!
-    lesson(id: String!): Lesson
-    section(id: String!): Section
-    exercise(id: String!): Exercise
+    lesson(id: Int!): Lesson
+    section(id: Int!): Section
+    exercise(id: Int!): Exercise
 }
 
 type Mutation{
-    addLesson(id: String!, title: String, img: String, objectives: [String] ): Lesson
-    addSection(id: String!, lessonId: String!, title: String, audio: String, type: String): Section
-    addExercise(id: String!, sectionId: String!, type: String!, answer: String!, inputs: [String]!, instructions: String, prompt: String): Exercise
-    removeExercise(id: String!): Exercise
-    removeSection(id: String!): Section
-    removeLesson(id:String!): Lesson
-    updateLesson(id:String!, input: LessonInput): Lesson
-    updateSection(id:String!, input: SectionInput): Section
-    updateExercise(id:String!, input: ExerciseInput): Exercise
+    addLesson(identifier: String, title: String, img: String, objectives: [String] ): Lesson
+    addSection(identifier: String, lessonId: Int!, title: String, audio: String, type: String): Section
+    addExercise(identifier: String, sectionId: Int!, type: String!, answer: String!, inputs: [String]!, instructions: String, prompt: String): Exercise
+    removeExercise(id: Int!): Exercise
+    removeSection(id: Int!): Section
+    removeLesson(id:Int!): Lesson
+    updateLesson(id:Int!, input: LessonInput): Lesson
+    updateSection(id:Int!, input: SectionInput): Section
+    updateExercise(id:Int!, input: ExerciseInput): Exercise
 }
 `;
 
 const resolvers = {
   Mutation: {
-    addLesson: async (parent, { id, title, img, objectives }) => {
-      const newLesson = { id, title, img, objectives, sections: [] };
+    addLesson: async (parent, { identifier, title, img, objectives }) => {
+      const newLesson = { identifier, title, img, objectives, sections: [] };
       fetch(`${db}/lessons`, {
         method: 'post',
         body: JSON.stringify(newLesson),
@@ -164,9 +176,12 @@ const resolvers = {
         .then(res => res.json())
         .catch(e => console.error(e));
     },
-    addSection: async (parent, { id, lessonId, title, audio, type }) => {
+    addSection: async (
+      parent,
+      { identifier, lessonId, title, audio, type }
+    ) => {
       const newSection = {
-        id,
+        identifier,
         type,
         lesson: lessonId,
         title,
@@ -197,10 +212,10 @@ const resolvers = {
     },
     addExercise: async (
       parent,
-      { id, sectionId, type, answer, inputs, instructions, prompt }
+      { identifier, sectionId, type, answer, inputs, instructions, prompt }
     ) => {
       const newExercise = {
-        id,
+        identifier,
         section: sectionId,
         type,
         answer,
@@ -281,9 +296,10 @@ const resolvers = {
         .then(res => res.json())
         .catch(e => console.error(e));
       // remove the section id from all lesson.sections for all lessons
-      const lessonsToUpdate = lessons.filter(({ sections }) =>
-        sections.includes(id)
+      const lessonsToUpdate = lessons.filter(lesson =>
+        lesson.sections.includes(Number(id))
       );
+      console.log(lessonsToUpdate);
 
       // update lessons
       await lessonsToUpdate.forEach(async lesson => {

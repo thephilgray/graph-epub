@@ -1,38 +1,5 @@
 {
-  "lessons": [
-    {
-      "id": "3",
-      "sections": [
-        "3"
-      ],
-      "title": "old title",
-      "objectives": [
-        "one",
-        "two"
-      ]
-    }
-  ],
-  "sections": [
-    {
-      "id": "3",
-      "lesson": "3",
-      "title": "section 3!!!",
-      "exercises": [
-        "4a"
-      ]
-    }
-  ],
-  "exercises": [
-    {
-      "id": "4a",
-      "section": "3",
-      "type": "true-or-false",
-      "answer": "0",
-      "inputs": [
-        "true",
-        "false"
-      ],
-      "instructions": "True or false."
-    }
-  ]
+  "lessons": [],
+  "sections": [],
+  "exercises": []
 }
