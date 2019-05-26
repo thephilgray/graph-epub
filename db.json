@@ -4,6 +4,11 @@
       "id": "3",
       "sections": [
         "3"
+      ],
+      "title": "old title",
+      "objectives": [
+        "one",
+        "two"
       ]
     }
   ],
@@ -11,7 +16,7 @@
     {
       "id": "3",
       "lesson": "3",
-      "title": "lesson 3, section 3",
+      "title": "section 3!!!",
       "exercises": [
         "4a"
       ]

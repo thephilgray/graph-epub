@@ -84,9 +84,28 @@ class Lesson {
 }
 
 const typeDefs = `
+
+input LessonInput{
+    title: String
+    img: String
+    objectives: [String]
+}
+input SectionInput{
+    type: String
+    title: String
+    audio: String
+}
+input ExerciseInput{
+    type: String
+    answer: String
+    instructions: String
+    prompt: String
+    inputs: [String]
+    quizType: String
+}
 type Lesson {
     id: String!
-    title: String!
+    title: String
     img: String
     objectives: [String]
     sections: [Section]
@@ -127,6 +146,9 @@ type Mutation{
     removeExercise(id: String!): Exercise
     removeSection(id: String!): Section
     removeLesson(id:String!): Lesson
+    updateLesson(id:String!, input: LessonInput): Lesson
+    updateSection(id:String!, input: SectionInput): Section
+    updateExercise(id:String!, input: ExerciseInput): Exercise
 }
 `;
 
@@ -314,6 +336,39 @@ const resolvers = {
 
       await fetch(`${db}/lessons/${id}`, {
         method: 'delete'
+      })
+        .then(res => res.json())
+        .catch(e => console.error(e));
+    },
+    updateLesson: async (parent, { id, input }) => {
+      await fetch(`${db}/lessons/${id}`, {
+        method: 'patch',
+        body: JSON.stringify({
+          ...input
+        }),
+        headers: { 'Content-Type': 'application/json' }
+      })
+        .then(res => res.json())
+        .catch(e => console.error(e));
+    },
+    updateSection: async (parent, { id, input }) => {
+      await fetch(`${db}/sections/${id}`, {
+        method: 'patch',
+        body: JSON.stringify({
+          ...input
+        }),
+        headers: { 'Content-Type': 'application/json' }
+      })
+        .then(res => res.json())
+        .catch(e => console.error(e));
+    },
+    updateExercise: async (parent, { id, input }) => {
+      await fetch(`${db}/exercise/${id}`, {
+        method: 'patch',
+        body: JSON.stringify({
+          ...input
+        }),
+        headers: { 'Content-Type': 'application/json' }
       })
         .then(res => res.json())
         .catch(e => console.error(e));
