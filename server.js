@@ -2,6 +2,7 @@ const { GraphQLServer } = require('graphql-yoga');
 const fetch = require('node-fetch');
 const jsonServer = require('json-server');
 const uniqid = require('uniqid');
+const isEmpty = require('lodash/isEmpty');
 
 const dbServer = jsonServer.create();
 const router = jsonServer.router('db.json');
@@ -188,6 +189,14 @@ const resolvers = {
         audio,
         exercises: []
       };
+
+      const parentLesson = await fetch(`${db}/lessons/${lessonId}`)
+        .then(res => res.json())
+        .catch(e => console.error(e));
+
+      if (isEmpty(parentLesson))
+        throw new Error(`lesson ${lessonId} does not exist`);
+
       const { id: sectionId } = await fetch(`${db}/sections`, {
         method: 'post',
         body: JSON.stringify(newSection),
@@ -223,6 +232,14 @@ const resolvers = {
         instructions,
         prompt
       };
+
+      const parentSection = await fetch(`${db}/sections/${sectionId}`)
+        .then(res => res.json())
+        .catch(e => console.error(e));
+
+      if (isEmpty(parentSection))
+        throw new Error(`lesson ${sectionId} does not exist`);
+
       const { id: exerciseId } = await fetch(`${db}/exercises`, {
         method: 'post',
         body: JSON.stringify(newExercise),
