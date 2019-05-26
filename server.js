@@ -124,6 +124,9 @@ type Mutation{
     addLesson(id: String!, title: String, img: String, objectives: [String] ): Lesson
     addSection(id: String!, lessonId: String!, title: String, audio: String, type: String): Section
     addExercise(id: String!, sectionId: String!, type: String!, answer: String!, inputs: [String]!, instructions: String, prompt: String): Exercise
+    removeExercise(id: String!): Exercise
+    removeSection(id: String!): Section
+    removeLesson(id:String!): Lesson
 }
 `;
 
@@ -201,6 +204,116 @@ const resolvers = {
         method: 'patch',
         body: JSON.stringify({ exercises }),
         headers: { 'Content-Type': 'application/json' }
+      })
+        .then(res => res.json())
+        .catch(e => console.error(e));
+    },
+    removeExercise: async (parent, { id }) => {
+      // do everything backwards
+      const sections = await fetch(`${db}/sections`)
+        .then(res => res.json())
+        .catch(e => console.error(e));
+
+      const filteredSections = sections.filter(({ exercises }) =>
+        exercises.includes(id)
+      );
+
+      await filteredSections.forEach(async section => {
+        await fetch(`${db}/sections/${section.id}`, {
+          method: 'patch',
+          body: JSON.stringify({
+            exercises: [
+              ...section.exercises.filter(exercise => exercise !== id)
+            ]
+          }),
+          headers: { 'Content-Type': 'application/json' }
+        })
+          .then(res => res.json())
+          .catch(e => console.error(e));
+      });
+
+      // then remove exercise
+      await fetch(`${db}/exercises/${id}`, {
+        method: 'delete'
+      })
+        .then(res => res.json())
+        .catch(e => console.error(e));
+    },
+    removeSection: async (parent, { id }) => {
+      // remove any exercises associated with that section
+
+      const exercisesToRemove = await fetch(`${db}/exercises?section=${id}`)
+        .then(res => res.json())
+        .catch(e => console.error(e));
+
+      await exercisesToRemove.forEach(async exercise => {
+        await fetch(`${db}/exercises/${exercise.id}`, {
+          method: 'delete'
+        })
+          .then(res => res.json())
+          .catch(e => console.error(e));
+      });
+
+      // fetch all lessons
+      const lessons = await fetch(`${db}/lessons`)
+        .then(res => res.json())
+        .catch(e => console.error(e));
+      // remove the section id from all lesson.sections for all lessons
+      const lessonsToUpdate = lessons.filter(({ sections }) =>
+        sections.includes(id)
+      );
+
+      // update lessons
+      await lessonsToUpdate.forEach(async lesson => {
+        await fetch(`${db}/lessons/${lesson.id}`, {
+          method: 'patch',
+          body: JSON.stringify({
+            sections: lesson.sections.filter(section => section !== id)
+          }),
+          headers: { 'Content-Type': 'application/json' }
+        })
+          .then(res => res.json())
+          .catch(e => console.error(e));
+      });
+
+      // finally, remove section
+      await fetch(`${db}/sections/${id}`, {
+        method: 'delete'
+      })
+        .then(res => res.json())
+        .catch(e => console.error(e));
+    },
+    removeLesson: async (parent, { id }) => {
+      // fetch all the sections from that lesson
+      const allSections = await fetch(`${db}/sections`)
+        .then(res => res.json())
+        .catch(e => console.error(e));
+
+      const allExercisesInSections = allSections.reduce((acc, curr) => {
+        if (curr.lesson === id) {
+          acc.push(...curr.exercises);
+        }
+        return acc;
+      }, []);
+
+      // filter out all the exercises from those sections
+      await allExercisesInSections.forEach(async exercise => {
+        await fetch(`${db}/exercises/${exercise}`, { method: 'delete' })
+          .then(res => res.json())
+          .catch(e => console.error(e));
+      });
+
+      // remove the sections
+      await allSections
+        .filter(({ lesson }) => lesson === id)
+        .forEach(async ({ id: sectionId }) => {
+          await fetch(`${db}/sections/${sectionId}`, { method: 'delete' })
+            .then(res => res.json())
+            .catch(e => console.error(e));
+        });
+
+      await fetch(`${db}/lessons/${id}`, {
+        method: 'delete'
       })
         .then(res => res.json())
         .catch(e => console.error(e));
