@@ -5,7 +5,7 @@ const uniqid = require('uniqid');
 const isEmpty = require('lodash/isEmpty');
 
 const dbServer = jsonServer.create();
-const router = jsonServer.router('db.json');
+const router = jsonServer.router('./db.json');
 const middlewares = jsonServer.defaults();
 const dbPort = '3000';
 const db = `http://localhost:${dbPort}`;
