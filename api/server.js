@@ -1,13 +1,13 @@
-const { GraphQLServer } = require('graphql-yoga');
-const fetch = require('node-fetch');
-const jsonServer = require('json-server');
-const uniqid = require('uniqid');
-const isEmpty = require('lodash/isEmpty');
+const { GraphQLServer } = require("graphql-yoga");
+const fetch = require("node-fetch");
+const jsonServer = require("json-server");
+const uniqid = require("uniqid");
+const isEmpty = require("lodash/isEmpty");
 
 const dbServer = jsonServer.create();
-const router = jsonServer.router('db.json');
+const router = jsonServer.router("./db.json");
 const middlewares = jsonServer.defaults();
-const dbPort = '3000';
+const dbPort = "5000";
 const db = `http://localhost:${dbPort}`;
 
 dbServer.use(middlewares);
@@ -17,7 +17,7 @@ dbServer.listen(dbPort, () => {
 });
 
 const getQuizType = multipleAnswers =>
-  multipleAnswers ? 'select-many' : 'select-one'; // may need to handle additional logic later
+  multipleAnswers ? "select-many" : "select-one"; // may need to handle additional logic later
 
 class Exercise {
   constructor({
@@ -37,7 +37,7 @@ class Exercise {
     this.instructions = instructions;
     this.prompt = prompt;
     this.inputs = inputs;
-    this.quizType = getQuizType(answer.split(',').length > 1);
+    this.quizType = getQuizType(answer.split(",").length > 1);
   }
 
   async section() {
@@ -170,9 +170,9 @@ const resolvers = {
     addLesson: async (parent, { identifier, title, img, objectives }) => {
       const newLesson = { identifier, title, img, objectives, sections: [] };
       fetch(`${db}/lessons`, {
-        method: 'post',
+        method: "post",
         body: JSON.stringify(newLesson),
-        headers: { 'Content-Type': 'application/json' }
+        headers: { "Content-Type": "application/json" }
       })
         .then(res => res.json())
         .catch(e => console.error(e));
@@ -198,9 +198,9 @@ const resolvers = {
         throw new Error(`lesson ${lessonId} does not exist`);
 
       const { id: sectionId } = await fetch(`${db}/sections`, {
-        method: 'post',
+        method: "post",
         body: JSON.stringify(newSection),
-        headers: { 'Content-Type': 'application/json' }
+        headers: { "Content-Type": "application/json" }
       })
         .then(res => res.json())
         .catch(e => console.error(e));
@@ -212,9 +212,9 @@ const resolvers = {
       sections.push(sectionId);
 
       await fetch(`${db}/lessons/${lessonId}`, {
-        method: 'patch',
+        method: "patch",
         body: JSON.stringify({ sections }),
-        headers: { 'Content-Type': 'application/json' }
+        headers: { "Content-Type": "application/json" }
       })
         .then(res => res.json())
         .then(json => console.log(json));
@@ -241,9 +241,9 @@ const resolvers = {
         throw new Error(`lesson ${sectionId} does not exist`);
 
       const { id: exerciseId } = await fetch(`${db}/exercises`, {
-        method: 'post',
+        method: "post",
         body: JSON.stringify(newExercise),
-        headers: { 'Content-Type': 'application/json' }
+        headers: { "Content-Type": "application/json" }
       })
         .then(res => res.json())
         .catch(e => console.error(e));
@@ -255,9 +255,9 @@ const resolvers = {
       exercises.push(exerciseId);
 
       await fetch(`${db}/sections/${sectionId}`, {
-        method: 'patch',
+        method: "patch",
         body: JSON.stringify({ exercises }),
-        headers: { 'Content-Type': 'application/json' }
+        headers: { "Content-Type": "application/json" }
       })
         .then(res => res.json())
         .catch(e => console.error(e));
@@ -274,13 +274,13 @@ const resolvers = {
 
       await filteredSections.forEach(async section => {
         await fetch(`${db}/sections/${section.id}`, {
-          method: 'patch',
+          method: "patch",
           body: JSON.stringify({
             exercises: [
               ...section.exercises.filter(exercise => exercise !== id)
             ]
           }),
-          headers: { 'Content-Type': 'application/json' }
+          headers: { "Content-Type": "application/json" }
         })
           .then(res => res.json())
           .catch(e => console.error(e));
@@ -288,7 +288,7 @@ const resolvers = {
 
       // then remove exercise
       await fetch(`${db}/exercises/${id}`, {
-        method: 'delete'
+        method: "delete"
       })
         .then(res => res.json())
         .catch(e => console.error(e));
@@ -302,7 +302,7 @@ const resolvers = {
 
       await exercisesToRemove.forEach(async exercise => {
         await fetch(`${db}/exercises/${exercise.id}`, {
-          method: 'delete'
+          method: "delete"
         })
           .then(res => res.json())
           .catch(e => console.error(e));
@@ -321,11 +321,11 @@ const resolvers = {
       // update lessons
       await lessonsToUpdate.forEach(async lesson => {
         await fetch(`${db}/lessons/${lesson.id}`, {
-          method: 'patch',
+          method: "patch",
           body: JSON.stringify({
             sections: lesson.sections.filter(section => section !== id)
           }),
-          headers: { 'Content-Type': 'application/json' }
+          headers: { "Content-Type": "application/json" }
         })
           .then(res => res.json())
           .catch(e => console.error(e));
@@ -333,7 +333,7 @@ const resolvers = {
 
       // finally, remove section
       await fetch(`${db}/sections/${id}`, {
-        method: 'delete'
+        method: "delete"
       })
         .then(res => res.json())
         .catch(e => console.error(e));
@@ -353,7 +353,7 @@ const resolvers = {
 
       // filter out all the exercises from those sections
       await allExercisesInSections.forEach(async exercise => {
-        await fetch(`${db}/exercises/${exercise}`, { method: 'delete' })
+        await fetch(`${db}/exercises/${exercise}`, { method: "delete" })
           .then(res => res.json())
           .catch(e => console.error(e));
       });
@@ -362,46 +362,46 @@ const resolvers = {
       await allSections
         .filter(({ lesson }) => lesson === id)
         .forEach(async ({ id: sectionId }) => {
-          await fetch(`${db}/sections/${sectionId}`, { method: 'delete' })
+          await fetch(`${db}/sections/${sectionId}`, { method: "delete" })
             .then(res => res.json())
             .catch(e => console.error(e));
         });
 
       await fetch(`${db}/lessons/${id}`, {
-        method: 'delete'
+        method: "delete"
       })
         .then(res => res.json())
         .catch(e => console.error(e));
     },
     updateLesson: async (parent, { id, input }) => {
       await fetch(`${db}/lessons/${id}`, {
-        method: 'patch',
+        method: "patch",
         body: JSON.stringify({
           ...input
         }),
-        headers: { 'Content-Type': 'application/json' }
+        headers: { "Content-Type": "application/json" }
       })
         .then(res => res.json())
         .catch(e => console.error(e));
     },
     updateSection: async (parent, { id, input }) => {
       await fetch(`${db}/sections/${id}`, {
-        method: 'patch',
+        method: "patch",
         body: JSON.stringify({
           ...input
         }),
-        headers: { 'Content-Type': 'application/json' }
+        headers: { "Content-Type": "application/json" }
       })
         .then(res => res.json())
         .catch(e => console.error(e));
     },
     updateExercise: async (parent, { id, input }) => {
       await fetch(`${db}/exercise/${id}`, {
-        method: 'patch',
+        method: "patch",
         body: JSON.stringify({
           ...input
         }),
-        headers: { 'Content-Type': 'application/json' }
+        headers: { "Content-Type": "application/json" }
       })
         .then(res => res.json())
         .catch(e => console.error(e));
