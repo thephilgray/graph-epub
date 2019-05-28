@@ -1,13 +1,14 @@
-import React from "react";
-import gql from "graphql-tag";
-import { useQuery } from "react-apollo-hooks";
+import React from 'react';
+import gql from 'graphql-tag';
+import { useQuery } from 'react-apollo-hooks';
 
-import LessonGridList from "./LessonsGridList";
+import LessonGridList from './LessonsGridList';
 
 const ALL_LESSONS = gql`
   query {
     lessons {
       title
+      id
       sections {
         title
         exercises {
