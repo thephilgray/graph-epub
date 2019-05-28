@@ -1,11 +1,12 @@
-import React from "react";
-import AllLessons from "../components/AllLessons";
+import React from 'react';
+import AllLessons from '../components/AllLessons';
+import Layout from '../components/Layout';
 
 function Lessons() {
   return (
-    <div>
+    <Layout>
       <AllLessons />
-    </div>
+    </Layout>
   );
 }
 

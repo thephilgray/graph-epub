@@ -19,43 +19,55 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.background.paper
   },
   gridList: {
-    width: 500,
-    height: 450
+    width: 500
+  },
+  gridListTile: {
+    // padding: '3em'
   },
   icon: {
     color: 'rgba(255, 255, 255, 0.54)'
   }
 }));
 
-function LessonsGridList({ tileData }) {
+function ItemGridList({ tileData, itemType }) {
   const classes = useStyles();
 
   return (
     <div className={classes.root}>
       <GridList cellHeight={180} className={classes.gridList}>
-        {tileData.lessons.length > 0
-          ? tileData.lessons.map(tile => (
-              <GridListTile key={tile.id + tile.title}>
-                <Link to={`/lesson/${tile.id}`}>
-                  <GridListTileBar
-                    title={tile.title}
-                    actionIcon={
+        {tileData && tileData.length > 0
+          ? tileData.map(tile => (
+              <GridListTile
+                key={tile.id + tile.title}
+                className={classes.gridListTile}
+              >
+                <img src="https://via.placeholder.com/500x300.png" alt="" />
+                <GridListTileBar
+                  title={tile.title}
+                  actionIcon={
+                    <Link
+                      to={`/${itemType}/${tile.id}`}
+                      key={tile.id + tile.title}
+                    >
                       <IconButton className={classes.icon}>
                         <EditIcon />
                       </IconButton>
-                    }
-                  />
-                </Link>
+                    </Link>
+                  }
+                />
               </GridListTile>
             ))
-          : 'No lessons added yet.'}
-        <GridListTile>
+          : 'No items added yet.'}
+        <GridListTile className={classes.gridListTile}>
+          <img src="https://via.placeholder.com/500x300.png" alt="" />
           <GridListTileBar
             title="Add"
             actionIcon={
-              <Fab color="primary" aria-label="Add">
-                <AddIcon />
-              </Fab>
+              <Link to={`/${itemType}s/add`}>
+                <Fab color="primary" aria-label="Add">
+                  <AddIcon />
+                </Fab>
+              </Link>
             }
           />
         </GridListTile>
@@ -64,4 +76,4 @@ function LessonsGridList({ tileData }) {
   );
 }
 
-export default LessonsGridList;
+export default ItemGridList;

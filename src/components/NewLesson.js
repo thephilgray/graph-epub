@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import gql from 'graphql-tag';
-import { useQuery, useMutation } from 'react-apollo-hooks';
+import { useMutation } from 'react-apollo-hooks';
 import { navigate } from '@reach/router';
 import { makeStyles } from '@material-ui/styles';
 import Typography from '@material-ui/core/Typography';
@@ -11,25 +11,11 @@ import BreadCrumbsNavigation from '../components/BreadCrumbsNavigation';
 import ItemGridList from './ItemGridList';
 import LessonFormFields from './LessonFormFields';
 
-const SINGLE_LESSON = gql`
-  query getLesson($id: String!) {
-    lesson(id: $id) {
+const ADD_LESSON = gql`
+  mutation ADD_LESSON($input: LessonInput) {
+    addLesson(input: $input) {
       id
-      title
-      img
-      objectives
-      sections {
-        id
-        title
-      }
-    }
-  }
-`;
-
-const UPDATE_LESSON = gql`
-  mutation UPDATE_LESSON($id: String!, $input: LessonInput) {
-    updateLesson(id: $id, input: $input) {
-      id
+      name
       title
       img
       objectives
@@ -64,47 +50,27 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function SingleLesson({ id }) {
-  const { data, error, loading } = useQuery(SINGLE_LESSON, {
-    variables: { id },
-    fetchPolicy: 'network-only'
-  });
-
+export default function NewLesson() {
   const [values, setValues] = useState({
     title: '',
+    name: '',
     img: '',
     objectives: []
   });
 
-  const updateLesson = useMutation(UPDATE_LESSON, {
-    variables: { id, input: { ...values } }
+  const addLesson = useMutation(ADD_LESSON, {
+    variables: {
+      input: { ...values }
+    }
   });
 
   const [newObjective, setNewObjective] = useState('');
 
   const classes = useStyles();
 
-  useEffect(() => {
-    if (data.lesson) {
-      setValues({
-        title: data.lesson.title || '',
-        img: data.lesson.img || '',
-        objectives: data.lesson.objectives || []
-      });
-    }
-  }, [data.lesson]);
-
-  if (loading) {
-    return <div>Loading....</div>;
-  }
-  if (error) {
-    return <div>Error! {error.message}</div>;
-  }
-  const { lesson } = data;
-
   const formSubmitHandler = e => {
     e.preventDefault();
-    updateLesson();
+    addLesson();
     navigate(`/`);
   };
 
@@ -134,8 +100,8 @@ export default function SingleLesson({ id }) {
       text: 'All Lessons'
     },
     {
-      href: `/lesson/${lesson.id}`,
-      text: lesson.title
+      href: `lessons/add`,
+      text: 'New Lesson'
     }
   ];
 
@@ -157,7 +123,7 @@ export default function SingleLesson({ id }) {
             <Typography variant="h6" gutterBottom>
               Sections
             </Typography>
-            <ItemGridList itemType="section" tileData={lesson.sections} />
+            <ItemGridList itemType="section" tileData={[]} />
           </Grid>
           <Grid item xs={12}>
             <Button
