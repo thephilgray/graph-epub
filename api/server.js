@@ -452,12 +452,13 @@ const resolvers = {
 (async function() {
   const restApi = jsonServer.router("api/db.json");
   const server = new GraphQLServer({ typeDefs, resolvers });
-  server.express.use("/db", restApi);
+  server.express.use("/json-server", restApi);
   const options = {
     port: 4000
   };
   await server.start(options, ({ port }) => {
-    db = `http://localhost:${port}/db/`;
-    console.log(`server is running on http://localhost:${port}`);
+    db = `http://localhost:${port}/json-server/`;
+    console.log(`Rest api is running on ${db}`);
+    console.log(`Graphql api is running on http://localhost:${port}`);
   });
 })();
