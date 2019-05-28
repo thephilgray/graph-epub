@@ -1,19 +1,23 @@
 {
   "lessons": [
     {
-      "title": "Test Lesson",
-      "sections": [
-        1
+      "id": "dkxm272uajw7r6otd",
+      "title": "Test 3",
+      "objectives": [
+        "do something",
+        "do something else"
       ],
-      "id": 2
+      "sections": [
+        "dkxm272uajw7r87vr"
+      ]
     }
   ],
   "sections": [
     {
-      "lesson": 2,
-      "title": "lesson 3, section 1",
-      "exercises": [],
-      "id": 1
+      "id": "dkxm272uajw7r87vr",
+      "lesson": "dkxm272uajw7r6otd",
+      "title": "test section",
+      "exercises": []
     }
   ],
   "exercises": []
