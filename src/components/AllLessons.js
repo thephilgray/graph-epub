@@ -23,7 +23,6 @@ const ALL_LESSONS = gql`
 
 export default function AllLessons() {
   const { data, error, loading } = useQuery(ALL_LESSONS);
-  console.log(data);
   if (loading) {
     return <div>Loading....</div>;
   }
