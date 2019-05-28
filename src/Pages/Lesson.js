@@ -1,9 +1,10 @@
-import React from "react";
+import React from 'react';
+import SingleLesson from '../components/SingleLesson';
 
 export default function Lesson({ id }) {
   return (
     <div>
-      <h1>Single Lesson View : Lesson {id}</h1>
+      <SingleLesson id={id} />
     </div>
   );
 }
