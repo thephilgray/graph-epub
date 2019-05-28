@@ -2,7 +2,7 @@ import React from 'react';
 import gql from 'graphql-tag';
 import { useQuery } from 'react-apollo-hooks';
 
-const SING_LESSON = gql`
+const SINGLE_LESSON = gql`
   query getLesson($id: String!) {
     lesson(id: $id) {
       id
@@ -13,7 +13,9 @@ const SING_LESSON = gql`
   }
 `;
 export default function SingleLesson({ id }) {
-  const { data, error, loading } = useQuery(SING_LESSON, { variables: { id } });
+  const { data, error, loading } = useQuery(SINGLE_LESSON, {
+    variables: { id }
+  });
   const { lesson } = data;
   if (loading) {
     return <div>Loading....</div>;
