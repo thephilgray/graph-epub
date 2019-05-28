@@ -438,9 +438,12 @@ const resolvers = {
             : []
         ),
 
-    lesson: id => fetch(`${db}/lessons/${id}`).then(res => res.json()),
-    section: id => fetch(`${db}/sections/${id}`).then(res => res.json()),
-    exercise: id => fetch(`${db}/exercises/${id}`).then(res => res.json())
+    lesson: (parent, { id }) =>
+      fetch(`${db}/lessons/${id}`).then(res => res.json()),
+    section: (parent, { id }) =>
+      fetch(`${db}/sections/${id}`).then(res => res.json()),
+    exercise: (parent, { id }) =>
+      fetch(`${db}/exercises/${id}`).then(res => res.json())
   }
 };
 
