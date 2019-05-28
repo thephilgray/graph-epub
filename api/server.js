@@ -101,16 +101,19 @@ const typeDefs = `
 
 input LessonInput{
     title: String
+    name: String
     img: String
     objectives: [String]
 }
 input SectionInput{
     type: String
+    name: String
     title: String
     audio: String
 }
 input ExerciseInput{
     type: String
+    name: String
     answer: String
     instructions: String
     prompt: String
@@ -119,6 +122,7 @@ input ExerciseInput{
 }
 type Lesson {
     id: String!
+    name: String
     title: String
     img: String
     objectives: [String]
@@ -127,6 +131,7 @@ type Lesson {
 
 type Section {
     id: String!
+    name: String
     type: String
     lesson: String!
     title: String!
@@ -135,6 +140,7 @@ type Section {
 }
 type Exercise {
     id: String!
+    name: String
     section: String!
     type: String!
     answer: String!
@@ -154,7 +160,7 @@ type Query{
 }
 
 type Mutation{
-    addLesson(name: String, title: String, img: String, objectives: [String] ): Lesson
+    addLesson(input: LessonInput): Lesson
     addSection(name: String, lessonId: String!, title: String, audio: String, type: String): Section
     addExercise(name: String, sectionId: String!, type: String!, answer: String!, inputs: [String]!, instructions: String, prompt: String): Exercise
     removeExercise(id: String!): Exercise
@@ -168,14 +174,11 @@ type Mutation{
 
 const resolvers = {
   Mutation: {
-    addLesson: async (parent, { name, title, img, objectives }) => {
+    addLesson: async (parent, { input }) => {
       const newLesson = {
         id: uniqid(),
-        name,
-        title,
-        img,
-        objectives,
-        sections: []
+        sections: [],
+        ...input
       };
       fetch(`${db}/lessons`, {
         method: 'post',
@@ -439,11 +442,20 @@ const resolvers = {
         ),
 
     lesson: (parent, { id }) =>
-      fetch(`${db}/lessons/${id}`).then(res => res.json()),
+      fetch(`${db}/lessons/${id}`)
+        .then(res => res.json())
+        .then(lesson => new Lesson(lesson))
+        .catch(e => console.error(e)),
     section: (parent, { id }) =>
-      fetch(`${db}/sections/${id}`).then(res => res.json()),
+      fetch(`${db}/sections/${id}`)
+        .then(res => res.json())
+        .then(section => new Section(section))
+        .catch(e => console.error(e)),
     exercise: (parent, { id }) =>
-      fetch(`${db}/exercises/${id}`).then(res => res.json())
+      fetch(`${db}/exercises/${id}`)
+        .then(res => res.json())
+        .then(exercise => new Exercise(exercise))
+        .catch(e => console.error(e))
   }
 };
 
