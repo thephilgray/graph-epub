@@ -411,15 +411,25 @@ const resolvers = {
     lessons: () =>
       fetch(`${db}/lessons`)
         .then(res => res.json())
-        .then(lessons => lessons.map(lesson => new Lesson(lesson))),
+        .then(lessons =>
+          lessons.length > 0 ? lessons.map(lesson => new Lesson(lesson)) : []
+        ),
     sections: () =>
       fetch(`${db}/sections`)
         .then(res => res.json())
-        .then(sections => sections.map(section => new Section(section))),
+        .then(sections =>
+          sections.length > 0
+            ? sections.map(section => new Section(section))
+            : []
+        ),
     exercises: () =>
       fetch(`${db}/exercises`)
         .then(res => res.json())
-        .then(exercises => exercises.map(exercise => new Exercise(exercise))),
+        .then(exercises =>
+          exercises.length > 0
+            ? exercises.map(exercise => new Exercise(exercise))
+            : []
+        ),
 
     lesson: id => fetch(`${db}/lessons/${id}`).then(res => res.json()),
     section: id => fetch(`${db}/sections/${id}`).then(res => res.json()),
