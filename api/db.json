@@ -1,5 +1,20 @@
 {
-  "lessons": [],
-  "sections": [],
+  "lessons": [
+    {
+      "title": "Test Lesson",
+      "sections": [
+        1
+      ],
+      "id": 2
+    }
+  ],
+  "sections": [
+    {
+      "lesson": 2,
+      "title": "lesson 3, section 1",
+      "exercises": [],
+      "id": 1
+    }
+  ],
   "exercises": []
 }
