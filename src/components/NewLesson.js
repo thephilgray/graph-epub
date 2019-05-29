@@ -3,12 +3,10 @@ import gql from 'graphql-tag';
 import { useMutation } from 'react-apollo-hooks';
 import { navigate } from '@reach/router';
 import { makeStyles } from '@material-ui/styles';
-import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import SaveIcon from '@material-ui/icons/Save';
 import Grid from '@material-ui/core/Grid';
 import BreadCrumbsNavigation from '../components/BreadCrumbsNavigation';
-import ItemGridList from './ItemGridList';
 import LessonFormFields from './LessonFormFields';
 
 const ADD_LESSON = gql`
@@ -66,16 +64,33 @@ export default function NewLesson() {
 
   const [newObjective, setNewObjective] = useState('');
 
+  const [breadcrumbsData, setBreadcrumbsData] = useState([
+    {
+      href: '/',
+      text: 'All Lessons'
+    },
+    {
+      href: `/lessons/add`,
+      text: 'New Lesson'
+    }
+  ]);
+
   const classes = useStyles();
 
   const formSubmitHandler = e => {
     e.preventDefault();
-    addLesson();
-    navigate(`/`);
+    addLesson().then(({ data }) => {
+      navigate(`/lesson/${data.addLesson.id}`);
+    });
   };
 
   const handleChange = name => event => {
     setValues({ ...values, [name]: event.target.value });
+    if (name === 'title') {
+      const newBreadCrumbsData = [...breadcrumbsData];
+      newBreadCrumbsData[1].text = event.target.value;
+      setBreadcrumbsData(newBreadCrumbsData);
+    }
   };
 
   const removeObjective = objectiveId => event => {
@@ -94,17 +109,6 @@ export default function NewLesson() {
     setNewObjective('');
   };
 
-  const breadcrumbsData = [
-    {
-      href: '/',
-      text: 'All Lessons'
-    },
-    {
-      href: `lessons/add`,
-      text: 'New Lesson'
-    }
-  ];
-
   return (
     <div className={classes.root}>
       <BreadCrumbsNavigation breadcrumbsData={breadcrumbsData} />
@@ -119,12 +123,6 @@ export default function NewLesson() {
             classes={classes}
             addObjective={addObjective}
           />
-          <Grid item xs={12}>
-            <Typography variant="h6" gutterBottom>
-              Sections
-            </Typography>
-            <ItemGridList itemType="section" tileData={[]} />
-          </Grid>
           <Grid item xs={12}>
             <Button
               variant="contained"
