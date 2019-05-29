@@ -96,12 +96,14 @@ input LessonInput{
     objectives: [String]
 }
 input SectionInput{
+    lessonId: String!
     type: String
     name: String
     title: String
     audio: String
 }
 input ExerciseInput{
+    sectionId: String!
     type: String
     name: String
     answer: String
@@ -152,8 +154,8 @@ type Query{
 
 type Mutation{
     addLesson(input: LessonInput): Lesson
-    addSection(name: String, lessonId: String!, title: String, audio: String, type: String): Section
-    addExercise(name: String, sectionId: String!, type: String!, answer: String!, inputs: [String]!, instructions: String, prompt: String): Exercise
+    addSection(input: SectionInput): Section
+    addExercise(input: ExerciseInput): Exercise
     removeExercise(id: String!): Exercise
     removeSection(id: String!): Section
     removeLesson(id:String!): Lesson
@@ -179,15 +181,13 @@ const resolvers = {
         .then(res => res.json())
         .catch(e => console.error(e));
     },
-    addSection: async (parent, { name, lessonId, title, audio, type }) => {
+    addSection: async (parent, { input }) => {
+      const { lessonId } = input;
       const newSection = {
         id: uniqid(),
-        name,
-        type,
         lesson: lessonId,
-        title,
-        audio,
-        exercises: []
+        exercises: [],
+        ...input
       };
 
       const parentLesson = await fetch(`${db}/lessons/${lessonId}`)
