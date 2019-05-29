@@ -1,6 +1,6 @@
 import React from 'react';
 import gql from 'graphql-tag';
-import { useQuery } from 'react-apollo-hooks';
+import { useQuery, useMutation } from 'react-apollo-hooks';
 
 import ItemGridList from './ItemGridList';
 
@@ -22,10 +22,21 @@ const ALL_LESSONS = gql`
   }
 `;
 
+const DELETE_LESSON = gql`
+  mutation DELETE_LESSON($id: String!) {
+    removeLesson(id: $id) {
+      id
+    }
+  }
+`;
+
 export default function AllLessons() {
-  const { data, error, loading } = useQuery(ALL_LESSONS, {
+  const { data, error, loading, refetch } = useQuery(ALL_LESSONS, {
     fetchPolicy: 'network-only'
   });
+
+  const deleteLesson = useMutation(DELETE_LESSON);
+
   if (loading) {
     return <div>Loading....</div>;
   }
@@ -35,7 +46,12 @@ export default function AllLessons() {
   return (
     <>
       <h1>All Lessons</h1>
-      <ItemGridList tileData={data.lessons} itemType="lesson" />
+      <ItemGridList
+        tileData={data.lessons}
+        itemType="lesson"
+        refetchItems={refetch}
+        deleteItem={deleteLesson}
+      />
     </>
   );
 }

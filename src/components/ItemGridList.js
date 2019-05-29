@@ -6,6 +6,7 @@ import GridListTileBar from '@material-ui/core/GridListTileBar';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
 // import ListSubheader from "@material-ui/core/ListSubheader";
 import IconButton from '@material-ui/core/IconButton';
 import { Link } from '@reach/router';
@@ -29,7 +30,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function ItemGridList({ tileData, itemType }) {
+function ItemGridList({ tileData, itemType, refetchItems, deleteItem }) {
   const classes = useStyles();
 
   return (
@@ -45,14 +46,27 @@ function ItemGridList({ tileData, itemType }) {
                 <GridListTileBar
                   title={tile.title}
                   actionIcon={
-                    <Link
-                      to={`/${itemType}/${tile.id}`}
-                      key={tile.id + tile.title}
-                    >
-                      <IconButton className={classes.icon}>
-                        <EditIcon />
+                    <>
+                      <Link
+                        to={`/${itemType}/${tile.id}`}
+                        key={tile.id + tile.title}
+                      >
+                        <IconButton className={classes.icon}>
+                          <EditIcon />
+                        </IconButton>
+                      </Link>
+
+                      <IconButton
+                        className={classes.icon}
+                        onClick={() => {
+                          deleteItem({ variables: { id: tile.id } }).then(() =>
+                            refetchItems()
+                          );
+                        }}
+                      >
+                        <DeleteIcon />
                       </IconButton>
-                    </Link>
+                    </>
                   }
                 />
               </GridListTile>
@@ -64,7 +78,7 @@ function ItemGridList({ tileData, itemType }) {
             title="Add"
             actionIcon={
               <Link to={`/${itemType}s/add`}>
-                <Fab color="primary" aria-label="Add">
+                <Fab color="primary" aria-label="Add" size="small">
                   <AddIcon />
                 </Fab>
               </Link>
