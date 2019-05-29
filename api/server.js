@@ -132,6 +132,7 @@ type Exercise {
     id: String!
     name: String
     section: String!
+    lesson: String!
     type: String!
     answer: String!
     instructions: String
@@ -196,7 +197,7 @@ const resolvers = {
       if (isEmpty(parentLesson))
         throw new Error(`lesson ${lessonId} does not exist`);
 
-      const { id: sectionId } = await fetch(`${db}/sections`, {
+      const section = await fetch(`${db}/sections`, {
         method: 'post',
         body: JSON.stringify(newSection),
         headers: { 'Content-Type': 'application/json' }
@@ -208,15 +209,17 @@ const resolvers = {
         .then(res => res.json())
         .catch(e => console.error(e));
 
-      sections.push(sectionId);
+      sections.push(section.id);
 
-      return await fetch(`${db}/lessons/${lessonId}`, {
+      await fetch(`${db}/lessons/${lessonId}`, {
         method: 'patch',
         body: JSON.stringify({ sections }),
         headers: { 'Content-Type': 'application/json' }
       })
         .then(res => res.json())
-        .then(json => console.log(json));
+        .catch(e => console.error(e));
+
+      return section;
     },
     addExercise: async (
       parent,
@@ -240,7 +243,10 @@ const resolvers = {
       if (isEmpty(parentSection))
         throw new Error(`lesson ${sectionId} does not exist`);
 
-      const { id: exerciseId } = await fetch(`${db}/exercises`, {
+      // add the lesson id to the new exercise
+      newExercise.lesson = parentSection.lesson;
+
+      const exercise = await fetch(`${db}/exercises`, {
         method: 'post',
         body: JSON.stringify(newExercise),
         headers: { 'Content-Type': 'application/json' }
@@ -252,15 +258,17 @@ const resolvers = {
         .then(res => res.json())
         .catch(e => console.error(e));
 
-      exercises.push(exerciseId);
+      exercises.push(exercise.id);
 
-      return await fetch(`${db}/sections/${sectionId}`, {
+      await fetch(`${db}/sections/${sectionId}`, {
         method: 'patch',
         body: JSON.stringify({ exercises }),
         headers: { 'Content-Type': 'application/json' }
       })
         .then(res => res.json())
         .catch(e => console.error(e));
+
+      return exercise;
     },
     removeExercise: async (parent, { id }) => {
       // do everything backwards
@@ -287,11 +295,13 @@ const resolvers = {
       });
 
       // then remove exercise
-      return fetch(`${db}/exercises/${id}`, {
+      await fetch(`${db}/exercises/${id}`, {
         method: 'delete'
       })
         .then(res => res.json())
         .catch(e => console.error(e));
+
+      return { id };
     },
     removeSection: async (parent, { id }) => {
       // remove any exercises associated with that section
@@ -316,7 +326,6 @@ const resolvers = {
       const lessonsToUpdate = lessons.filter(lesson =>
         lesson.sections.includes(Number(id))
       );
-      console.log(lessonsToUpdate);
 
       // update lessons
       await lessonsToUpdate.forEach(async lesson => {
@@ -332,11 +341,12 @@ const resolvers = {
       });
 
       // finally, remove section
-      return fetch(`${db}/sections/${id}`, {
+      await fetch(`${db}/sections/${id}`, {
         method: 'delete'
       })
         .then(res => res.json())
         .catch(e => console.error(e));
+      return { id };
     },
     removeLesson: async (parent, { id }) => {
       // fetch all the sections from that lesson
@@ -367,11 +377,13 @@ const resolvers = {
             .catch(e => console.error(e));
         });
 
-      return fetch(`${db}/lessons/${id}`, {
+      await fetch(`${db}/lessons/${id}`, {
         method: 'delete'
       })
         .then(res => res.json())
         .catch(e => console.error(e));
+
+      return { id };
     },
     updateLesson: async (parent, { id, input }) => {
       return fetch(`${db}/lessons/${id}`, {
