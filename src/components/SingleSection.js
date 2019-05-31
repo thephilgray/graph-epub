@@ -7,19 +7,21 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import SaveIcon from '@material-ui/icons/Save';
 import Grid from '@material-ui/core/Grid';
-
 import BreadCrumbsNavigation from '../components/BreadCrumbsNavigation';
 import ItemGridList from './ItemGridList';
-import LessonFormFields from './LessonFormFields';
+import SectionFormFields from './SectionFormFields';
 
-const SINGLE_LESSON = gql`
-  query getLesson($id: String!) {
-    lesson(id: $id) {
+const SINGLE_SECTION = gql`
+  query getSection($id: String!) {
+    section(id: $id) {
       id
       title
-      img
-      objectives
-      sections {
+      audio
+      type
+      exercises {
+        id
+      }
+      lesson {
         id
         title
       }
@@ -27,31 +29,18 @@ const SINGLE_LESSON = gql`
   }
 `;
 
-const UPDATE_LESSON = gql`
-  mutation UPDATE_LESSON($id: String!, $input: LessonInput) {
-    updateLesson(id: $id, input: $input) {
+const UPDATE_SECTION = gql`
+  mutation UPDATE_SECTION($id: String!, $input: SectionInput) {
+    updateSection(id: $id, input: $input) {
       id
       title
-      img
-      objectives
+      audio
+      lesson {
+        id
+      }
     }
   }
 `;
-
-const DELETE_SECTION = gql`
-  mutation DELETE_SECTION($id: String!) {
-    removeSection(id: $id)
-  }
-`;
-
-// const ADD_SECTION = gql`
-//   mutation ADD_SECTION($lessonId: String!, $input: SectionInput) {
-//     addSection(lessonId: $lessonId, input: $input) {
-//       id
-//       title
-//     }
-//   }
-// `;
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -80,28 +69,29 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function SingleLesson({ id }) {
-  const classes = useStyles();
-  const { data, error, loading, refetch } = useQuery(SINGLE_LESSON, {
+export default function SingleSection({ id, lessonId }) {
+  const { data, error, loading } = useQuery(SINGLE_SECTION, {
     variables: { id }
   });
 
   const [values, setValues] = useState({
     title: '',
-    img: '',
-    objectives: []
+    audio: '',
+    type: ''
   });
 
-  const updateLesson = useMutation(UPDATE_LESSON, {
+  const updateSection = useMutation(UPDATE_SECTION, {
     variables: { id, input: { ...values } }
   });
-  const deleteSection = useMutation(DELETE_SECTION);
 
-  const [newObjective, setNewObjective] = useState('');
   const [breadcrumbsData, setBreadcrumbsData] = useState([
     {
       href: '/',
       text: 'All Lessons'
+    },
+    {
+      href: `/lesson/${lessonId}`,
+      text: lessonId
     },
     {
       href: ``,
@@ -109,20 +99,22 @@ export default function SingleLesson({ id }) {
     }
   ]);
 
-  useEffect(() => {
-    if (data.lesson) {
-      setValues({
-        title: data.lesson.title || '',
-        img: data.lesson.img || '',
-        objectives: data.lesson.objectives || []
-      });
+  const classes = useStyles();
 
+  useEffect(() => {
+    if (!data.loading && !data.error && data.section) {
+      setValues({
+        title: data.section.title || '',
+        audio: data.section.audio || '',
+        type: data.section.type || ''
+      });
       let updatedBreadcrumbs = [...breadcrumbsData];
-      updatedBreadcrumbs[1].text = data.lesson.title;
+      updatedBreadcrumbs[1].text = data.section.lesson.title;
+      updatedBreadcrumbs[2].text = data.section.title;
       setBreadcrumbsData([...updatedBreadcrumbs]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.lesson]);
+  }, [data.section]);
 
   if (loading) {
     return <div>Loading....</div>;
@@ -130,40 +122,27 @@ export default function SingleLesson({ id }) {
   if (error) {
     return <div>Error! {error.message}</div>;
   }
-
-  const { lesson } = data;
+  const { section } = data;
 
   const formSubmitHandler = e => {
     e.preventDefault();
-    updateLesson()
+    updateSection()
       .then(() => {
-        navigate(`/`);
+        navigate(`/lesson/${lessonId}`);
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        console.error(err);
+        navigate(`/`);
+      });
   };
 
   const handleChange = name => event => {
     setValues({ ...values, [name]: event.target.value });
     if (name === 'title') {
       const newBreadCrumbsData = [...breadcrumbsData];
-      newBreadCrumbsData[1].text = event.target.value;
+      newBreadCrumbsData[2].text = event.target.value;
       setBreadcrumbsData(newBreadCrumbsData);
     }
-  };
-
-  const removeObjective = objectiveId => event => {
-    setValues({
-      ...values,
-      objectives: values.objectives.filter((objective, i) => i !== objectiveId)
-    });
-  };
-
-  const addObjective = event => {
-    setValues({
-      ...values,
-      objectives: values.objectives.concat(newObjective)
-    });
-    setNewObjective('');
   };
 
   return (
@@ -171,31 +150,28 @@ export default function SingleLesson({ id }) {
       <BreadCrumbsNavigation breadcrumbsData={breadcrumbsData} />
       <form onSubmit={formSubmitHandler}>
         <Grid container spacing={3}>
-          <LessonFormFields
+          <SectionFormFields
             values={values}
             handleChange={handleChange}
-            removeObjective={removeObjective}
-            newObjective={newObjective}
-            setNewObjective={setNewObjective}
             classes={classes}
-            addObjective={addObjective}
           />
           <Grid item xs={12}>
             <Typography variant="h6" gutterBottom>
-              Sections
+              Exercises
             </Typography>
             <ItemGridList
-              itemType="section"
-              tileData={lesson.sections}
-              deleteItem={deleteSection}
-              refetchItems={refetch}
-              // updateParent={updateLesson}
-              baseUrl={`/lesson/${id}/sections/`}
+              itemType="exercise"
+              tileData={section.exercises}
+              baseUrl={`/lesson/${lessonId}/sections/${id}/exercises/`}
             />
           </Grid>
-
           <Grid item xs={12}>
-            <Button variant="contained" size="medium" type="submit">
+            <Button
+              variant="contained"
+              size="medium"
+              type="submit"
+              className={classes.submitButton}
+            >
               <SaveIcon />
               Save
             </Button>

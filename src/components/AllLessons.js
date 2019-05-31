@@ -11,6 +11,7 @@ const ALL_LESSONS = gql`
       id
       img
       sections {
+        id
         title
         exercises {
           id
@@ -24,16 +25,12 @@ const ALL_LESSONS = gql`
 
 const DELETE_LESSON = gql`
   mutation DELETE_LESSON($id: String!) {
-    removeLesson(id: $id) {
-      id
-    }
+    removeLesson(id: $id)
   }
 `;
 
 export default function AllLessons() {
-  const { data, error, loading, refetch } = useQuery(ALL_LESSONS, {
-    fetchPolicy: 'network-only'
-  });
+  const { data, error, loading, refetch } = useQuery(ALL_LESSONS);
 
   const deleteLesson = useMutation(DELETE_LESSON);
 
@@ -51,6 +48,7 @@ export default function AllLessons() {
         itemType="lesson"
         refetchItems={refetch}
         deleteItem={deleteLesson}
+        baseUrl={`lessons/`}
       />
     </>
   );

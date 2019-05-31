@@ -1,23 +1,25 @@
 {
   "lessons": [
     {
-      "id": "dkxm272uajw7r6otd",
-      "title": "Test 3",
-      "objectives": [
-        "do something",
-        "do something else"
-      ],
+      "id": "afsikq7zajwcgkx9r",
       "sections": [
-        "dkxm272uajw7r87vr"
-      ]
+        "afsikq87ujwchhy5v"
+      ],
+      "title": "sdfsdsddsf",
+      "name": "",
+      "img": "",
+      "objectives": []
     }
   ],
   "sections": [
     {
-      "id": "dkxm272uajw7r87vr",
-      "lesson": "dkxm272uajw7r6otd",
-      "title": "test section",
-      "exercises": []
+      "id": "afsikq87ujwchhy5v",
+      "lesson": "afsikq7zajwcgkx9r",
+      "exercises": [],
+      "type": "",
+      "name": "",
+      "title": "asdsadsad",
+      "audio": ""
     }
   ],
   "exercises": []

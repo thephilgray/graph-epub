@@ -9,7 +9,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 // import ListSubheader from "@material-ui/core/ListSubheader";
 import IconButton from '@material-ui/core/IconButton';
-import { Link } from '@reach/router';
+import { Link, navigate } from '@reach/router';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -30,58 +30,64 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function ItemGridList({ tileData, itemType, refetchItems, deleteItem }) {
+function ItemGridList({
+  tileData,
+  itemType,
+  baseUrl,
+  refetchItems,
+  deleteItem,
+  updateParent
+}) {
   const classes = useStyles();
 
   return (
     <div className={classes.root}>
       <GridList cellHeight={180} className={classes.gridList}>
-        {tileData && tileData.length > 0
-          ? tileData.map(tile => (
-              <GridListTile
-                key={tile.id + tile.title}
-                className={classes.gridListTile}
-              >
-                <img src="https://via.placeholder.com/500x300.png" alt="" />
-                <GridListTileBar
-                  title={tile.title}
-                  actionIcon={
-                    <>
-                      <Link
-                        to={`/${itemType}/${tile.id}`}
-                        key={tile.id + tile.title}
-                      >
-                        <IconButton className={classes.icon}>
-                          <EditIcon />
-                        </IconButton>
-                      </Link>
-
-                      <IconButton
-                        className={classes.icon}
-                        onClick={() => {
-                          deleteItem({ variables: { id: tile.id } }).then(() =>
-                            refetchItems()
-                          );
-                        }}
-                      >
-                        <DeleteIcon />
+        {tileData &&
+          tileData.length > 0 &&
+          tileData.map(tile => (
+            <GridListTile key={tile.id} className={classes.gridListTile}>
+              <img src="https://via.placeholder.com/500x300.png" alt="" />
+              <GridListTileBar
+                title={tile.title || tile.id}
+                actionIcon={
+                  <>
+                    <Link to={`${itemType}/${tile.id}`} key={tile.id}>
+                      <IconButton className={classes.icon}>
+                        <EditIcon />
                       </IconButton>
-                    </>
-                  }
-                />
-              </GridListTile>
-            ))
-          : 'No items added yet.'}
+                    </Link>
+
+                    <IconButton
+                      className={classes.icon}
+                      onClick={() => {
+                        deleteItem({ variables: { id: tile.id } }).then(() =>
+                          refetchItems()
+                        );
+                      }}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </>
+                }
+              />
+            </GridListTile>
+          ))}
         <GridListTile className={classes.gridListTile}>
           <img src="https://via.placeholder.com/500x300.png" alt="" />
           <GridListTileBar
             title="Add"
             actionIcon={
-              <Link to={`/${itemType}s/add`}>
-                <Fab color="primary" aria-label="Add" size="small">
-                  <AddIcon />
-                </Fab>
-              </Link>
+              <Fab
+                color="primary"
+                aria-label="Add"
+                size="small"
+                onClick={() => {
+                  navigate(`${baseUrl}add`);
+                }}
+              >
+                <AddIcon />
+              </Fab>
             }
           />
         </GridListTile>
