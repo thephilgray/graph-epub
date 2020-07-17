@@ -22,7 +22,7 @@
     "graphql-yoga": "^1.17.4",
     "http-proxy-middleware": "^0.19.1",
     "json-server": "^0.15.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "node-fetch": "^2.6.0",
     "react": "^16.8.6",
     "react-apollo": "^2.5.6",
